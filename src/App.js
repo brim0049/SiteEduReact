@@ -8,6 +8,8 @@ import Menu from './Menu';
 import Accueil from './Pages/Accueil';
 import About from './Pages/About';
 import Contact from './Pages/Contact';
+import Demande from './Pages/Demande';
+import Consult from './Pages/Consult';
 import Inscription from './Components/Inscription/Inscription';
 import Connexion from './Components/Connexion/Connexion';
 function App() {
@@ -22,7 +24,9 @@ function App() {
           <Route path="/Contact" element={<Contact/>} />
           <Route path="/Inscription" element={<Inscription/>} />
           <Route path="/identification" element={<Connexion/>} />
+          <Route path="/demande" element={<Demande/>} />
           <Route path="/" element={<Accueil/>} />
+          <Route path="/Consult" element={<Consult/>} />
         </Routes>
       </div>
     </Router>

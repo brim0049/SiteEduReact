@@ -3,7 +3,21 @@ import { Link } from 'react-router-dom';
 import { Button, Navbar, Container, Nav } from "react-bootstrap";
 import { HashRouter, NavLink } from "react-router-dom";
 import { FaHome } from "react-icons/fa";
-function Menu() {
+import { connect, useDispatch } from "react-redux";
+import loginReducer from './Reducers/loginReducer';
+import { LogoutStudent } from './Services/service';
+import { useNavigate } from "react-router-dom";
+
+function Menu({login}) {
+  const {isLoggedIn} = login;
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    dispatch(LogoutStudent());
+    navigate("./identification");
+
+  }
   return (
       <Navbar bg="dark" variant="dark">
         <Container>
@@ -18,16 +32,34 @@ function Menu() {
             Contact
             </Nav.Link> 
             <Nav.Link to="/inscription" replace as={NavLink}>
-            Inscription
+            {isLoggedIn? null :'Inscription'}
+            
             </Nav.Link>
             <Nav.Link to="/identification" replace as={NavLink}>
-            Identification
+            {isLoggedIn? null :'Identification'}
+            
             </Nav.Link>
+            <Nav.Link to="/demande" replace as={NavLink}>
+            {isLoggedIn? "Demande d'aide financière" :null}
+            </Nav.Link>
+            <Nav.Link to="/Consult" replace as={NavLink}>
+            {isLoggedIn? "Consultation du dossier de l'étudiant" :null}
+            </Nav.Link>
+           
+            
+            </Nav>
+            <Nav>
+            <div className="ms-auto">            {isLoggedIn? "Consultation du dossier de l'étudiant" :null}
+            {isLoggedIn? (<Button onClick={handleLogout} variant="light">Logout</Button>) :null}
+
+            </div>
             </Nav>
         </Container>
       </Navbar>
 
   );
 }
-
-export default Menu;
+const mapStateToProps = (state) => ({
+  login: state.login,
+});
+export default connect(mapStateToProps, {logout:LogoutStudent})(Menu)

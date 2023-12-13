@@ -5,9 +5,11 @@ import React, { useState, useRef, useEffect } from "react";
 import { connect } from "react-redux";
 import { LoginStudent } from "../../Services/service";
 import { useNavigate } from "react-router-dom";
-
+import LoginViewModel from '../../ViewModels/ConnexionViewModel';
+import StudentModel from "../../Models/StudentModel"
+import AuthService from '../../Services/AuthService';
 function Connexion(props){
-
+  const viewModel = new AuthService();
   // redirect 
   const navigate = useNavigate();
   //get reference
@@ -15,39 +17,53 @@ function Connexion(props){
   const checkBtn = useRef();
   // state local
   const stateInput = {
-    cp: "",
-    pswd: "",
+    permanentCode: "",
+    password: "",
   };
-  //set State
-  const [formulaire, setForm] = useState(stateInput);
- //get all values input
- const handleSetForm = ({ target: { name, value } }) => {
-   setForm({ ...formulaire, [name]: value });
- };
-    
+     //set State
+     const [formulaire, setForm] = useState(stateInput);
+     //get all values input
+    const handleSetForm = ({ target: { name, value } }) => {
+  setForm({ ...formulaire, [name]: value });
+};
+  const handleLogin  = async (e) => {
+    const newStudent = new StudentModel(null, null,null,formulaire.permanentCode, formulaire.password);
+    const preparedData = LoginViewModel.prepareData(newStudent);
 
-   //button d'connexion  
- function handleLogin(e) {
-   e.preventDefault();
-       props.loginn(
-         formulaire.cp,
-         formulaire.pswd
-       )
-   }
+      e.preventDefault();
+    try {
+        const userData = await AuthService.Auth(preparedData);
+        console.log('User data:', userData);
+        props.loginn();
+
+        // Gérez la réussite de la connexion
+      } catch (error) {
+        console.error(error.message);
+        // Gérez les erreurs lors de la connexion
+      }
+    }
+   const codeper = localStorage.getItem('CodeD');
+   const pswd = localStorage.getItem('PS');
+   const successful = localStorage.getItem('sc');
    useEffect(() => {
     console.log('isLoggedIn:', props.login.isLoggedIn);
     // Si l'utilisateur est connecté, redirigez-le vers la page de profil
     if (props.login.isLoggedIn) {
       navigate("../demande");
     }
-  }, [props.login.isLoggedIn, navigate]);
+  }, [props.login.isLoggedIn, navigate]
+
+  );
 
   return(
     <>
        <h1>Connexion</h1>
       <div >
         <Row>
-          <Col></Col>
+          <Col>
+          {successful!== false ? <h3>Votre code permanent est: {codeper}</h3>: null}
+          {successful!== false ? <h3>Votre mot de passe temporaire est: {pswd}</h3>: null}
+          </Col>
           <Col className="justify-Content-center" md="auto">
             <img
               width="150"
@@ -67,8 +83,7 @@ function Connexion(props){
                 <br/>
                 <br/>
                 <Form.Control type="text" placeholder="Code permanent"
-                name="cp"
-                value={formulaire.cp}
+                name="permanentCode"
                 onChange={handleSetForm}
                 />
 <br/>
@@ -78,8 +93,7 @@ function Connexion(props){
                 <br/>
                 <Form.Control placeholder="Mot de passe"
                   type="password"
-                  name="pswd"
-                  value={formulaire.pswd}
+                  name="password"
                   onChange={handleSetForm}
                 />
               </Form.Group>

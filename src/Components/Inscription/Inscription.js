@@ -3,6 +3,9 @@ import { Form, Button, Row, Col } from "react-bootstrap";
 import { connect } from "react-redux";
 import { registerStudent } from "../../Services/service";
 import { useNavigate } from "react-router-dom";
+import StudentModel from "../../Models/StudentModel"
+import StudentViewModel from "../../ViewModels/InscriptionViewModel";
+import regService from "../../Services/registreService";
 function Inscription(props){
     // redirect 
     const navigate = useNavigate();
@@ -24,14 +27,38 @@ function Inscription(props){
     //*pour connaitre si l'inscription => oki */
     const [successful, setSuccessful] = useState(false);
     //button d'inscription  
-  function handleRegister(e) {
+    const handleRegister = async (e) => {
+      const newStudent = new StudentModel(null,formulaire.nas, formulaire.birthday);
+      const preparedData = StudentViewModel.prepareData(newStudent);
+      e.preventDefault();
+
+      try {
+        const registeredStudent = await regService.registerStudent(preparedData);
+        console.log('Étudiant inscrit :', registeredStudent);
+        // Gérez la réussite de l'inscription
+
+        props.register(
+          formulaire.nas,
+          formulaire.birthday,
+        )
+        setSuccessful(true);
+        localStorage.setItem('sc', true);
+
+      } catch (error) {
+        console.error(error.message);
+        // Gérez les erreurs lors de l'inscription
+      }
+    };
+  /*function handleRegister(e) {
     e.preventDefault();
         props.register(
           formulaire.nas,
           formulaire.birthday,
         )
         setSuccessful(true);
+        
     }
+    */
       //si inscription oki=> redirect vers login
   if (successful) {
       navigate("../identification"); 
